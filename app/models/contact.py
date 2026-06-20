@@ -4,10 +4,10 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class ContactRequest(BaseModel):
-    name: str = Field(..., min_length=2, max_length=50, examples=["Иван Иванов"])
+    name: str = Field(..., examples=["Иван Иванов"])
     phone: str = Field(..., examples=["+79991234567"])
     email: EmailStr = Field(..., examples=["ivan@example.com"])
-    comment: str = Field(..., min_length=10, max_length=500, examples=["Хочу обсудить проект"])
+    comment: str = Field(..., examples=["Хочу обсудить проект"])
 
     @field_validator("name")
     @classmethod
@@ -15,6 +15,8 @@ class ContactRequest(BaseModel):
         stripped = v.strip()
         if len(stripped) < 2:
             raise ValueError("Имя должно содержать минимум 2 символа")
+        if len(stripped) > 50:
+            raise ValueError("Имя должно содержать не более 50 символов")
         return stripped
 
     @field_validator("phone")
@@ -31,6 +33,8 @@ class ContactRequest(BaseModel):
         stripped = v.strip()
         if len(stripped) < 10:
             raise ValueError("Комментарий должен содержать минимум 10 символов")
+        if len(stripped) > 500:
+            raise ValueError("Комментарий должен содержать не более 500 символов")
         return stripped
 
 
