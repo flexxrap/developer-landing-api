@@ -1,0 +1,154 @@
+{
+  "info": {
+    "name": "Developer Landing API",
+    "description": "Collection for Developer Landing API. Set {{base_url}} to http://localhost:8000 for local development.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Contact",
+      "item": [
+        {
+          "name": "Submit contact — success",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Иван Иванов\",\n  \"phone\": \"+79991234567\",\n  \"email\": \"ivan@example.com\",\n  \"comment\": \"Хочу обсудить разработку веб-приложения\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/contact",
+              "host": ["{{base_url}}"],
+              "path": ["api", "contact"]
+            },
+            "description": "Успешная отправка заявки. Возвращает 200."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Заявка получена. Мы свяжемся с вами в ближайшее время.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Submit contact — validation error",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"I\",\n  \"phone\": \"abc\",\n  \"email\": \"not-an-email\",\n  \"comment\": \"Short\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/contact",
+              "host": ["{{base_url}}"],
+              "path": ["api", "contact"]
+            },
+            "description": "Данные не прошли валидацию. Возвращает 422 с описанием ошибок по каждому полю."
+          },
+          "response": [
+            {
+              "name": "422 Unprocessable Entity",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"detail\": [\n    { \"field\": \"name\", \"message\": \"Имя должно содержать минимум 2 символа\" },\n    { \"field\": \"phone\", \"message\": \"Неверный формат телефона. Пример: +79991234567\" },\n    { \"field\": \"email\", \"message\": \"value is not a valid email address\" },\n    { \"field\": \"comment\", \"message\": \"Комментарий должен содержать минимум 10 символов\" }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Submit contact — rate limited",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Иван Иванов\",\n  \"phone\": \"+79991234567\",\n  \"email\": \"ivan@example.com\",\n  \"comment\": \"Хочу обсудить разработку проекта\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/contact",
+              "host": ["{{base_url}}"],
+              "path": ["api", "contact"]
+            },
+            "description": "Срабатывает после 5 запросов с одного IP в течение часа. Возвращает 429."
+          },
+          "response": [
+            {
+              "name": "429 Too Many Requests",
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"detail\": {\n    \"message\": \"Слишком много запросов. Попробуйте позже.\",\n    \"retry_after\": 3421\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "health"]
+            },
+            "description": "Статус сервиса и время работы с момента запуска."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"ok\",\n  \"uptime_seconds\": 3842.17\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Metrics",
+      "item": [
+        {
+          "name": "Get metrics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/metrics",
+              "host": ["{{base_url}}"],
+              "path": ["api", "metrics"]
+            },
+            "description": "Статистика запросов: всего, успешных, заблокированных, разбивка по дням."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"total\": 42,\n  \"successful\": 38,\n  \"rate_limited\": 4,\n  \"by_day\": {\n    \"2026-06-20\": {\n      \"total\": 12,\n      \"successful\": 10,\n      \"rate_limited\": 2\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
