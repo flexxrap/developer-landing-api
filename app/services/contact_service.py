@@ -1,9 +1,9 @@
 from app.handlers import email_handler, logging_handler, rate_limit_handler
 from app.models.contact import ContactRequest
-from app.services import metrics_service
+from app.services import ai_service, metrics_service
 
 
-def process_contact(data: ContactRequest, client_ip: str) -> dict:
+async def process_contact(data: ContactRequest, client_ip: str) -> dict:
     allowed, retry_after = rate_limit_handler.check_rate_limit(client_ip)
 
     if not allowed:
@@ -11,11 +11,14 @@ def process_contact(data: ContactRequest, client_ip: str) -> dict:
         metrics_service.record("rate_limited")
         return {"blocked": True, "retry_after": retry_after}
 
+    ai_analysis = await ai_service.analyze_comment(data.comment)
+
     email_sent = email_handler.send_contact_emails(
         name=data.name,
         phone=data.phone,
         email=data.email,
         comment=data.comment,
+        ai_analysis=ai_analysis,
     )
 
     status = "success" if email_sent else "email_queued"

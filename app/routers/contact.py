@@ -9,7 +9,7 @@ router = APIRouter()
 @router.post("/contact", response_model=ContactResponse)
 async def submit_contact(request: Request, body: ContactRequest):
     client_ip = request.client.host
-    result = contact_service.process_contact(body, client_ip)
+    result = await contact_service.process_contact(body, client_ip)
 
     if result["blocked"]:
         raise HTTPException(
