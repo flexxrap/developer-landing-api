@@ -171,6 +171,9 @@ docker-compose up --build
 
 ## 6. Деплой на Railway
 
+**Live API:** https://developer-landing-api-production.up.railway.app  
+**Swagger UI:** https://developer-landing-api-production.up.railway.app/docs
+
 [Railway](https://railway.app) — PaaS-платформа с поддержкой Docker. Бесплатный tier включает 500 часов в месяц.
 
 ### Через GitHub (рекомендуется)
